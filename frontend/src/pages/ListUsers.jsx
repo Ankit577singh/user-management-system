@@ -14,16 +14,19 @@ function ListUsers() {
 
 const loadUsers = async () => {
   try {
-    setLoading(true);              
+    setLoading(true);
+    setUsers([]);           
+    setFilteredUsers([]);  
     const res = await getUsers(currentPage);
     setUsers(res.data.users);
     setFilteredUsers(res.data.users);
   } catch (error) {
     console.log("API Error:", error);
   } finally {
-    setLoading(false);            
+    setLoading(false);
   }
 };
+
 
 
   useEffect(() => {
@@ -192,7 +195,17 @@ const loadUsers = async () => {
             <p className="text-gray-500">
               {searchTerm ? `No results for "${searchTerm}"` : "No users available"}
             </p>
-          </div>
+                <div className="flex items-center justify-end gap-2 px-4 lg:px-6 py-3 lg:py-4 border-t border-gray-200">
+                    <button onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))} disabled={currentPage === 1} className="px-3 py-1 text-sm lg:text-base text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed">
+                              ‹
+                    </button>
+                     <button className="px-3 py-2 text-sm lg:text-base bg-red-600 text-white rounded-md min-w-[32px]">
+                        {currentPage}
+                      </button>
+                           
+                </div>
+              </div>
+          
         )}
 
         {/* Desktop Table View - Hidden on Mobile */}
@@ -215,7 +228,7 @@ const loadUsers = async () => {
                 <tbody className="divide-y divide-gray-200">
                   {filteredUsers.map((u, index) => (
                     <tr key={u._id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm text-gray-700">{index + 1}</td>
+                      <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm text-gray-700">{(currentPage - 1) * 5 + index + 1}</td>
                       <td className="px-4 lg:px-6 py-3 lg:py-4 text-xs lg:text-sm text-gray-700">
                         {u.firstName} {u.lastName}
                       </td>
@@ -367,7 +380,7 @@ const loadUsers = async () => {
                       <h3 className="font-semibold text-gray-800">
                         {u.firstName} {u.lastName}
                       </h3>
-                      <p className="text-xs text-gray-500">ID: {index + 1}</p>
+                      <p className="text-xs text-gray-500">ID: {(currentPage - 1) * 5 + index + 1}</p>
                     </div>
                   </div>
                   <div className="relative dropdown-container">
@@ -450,6 +463,7 @@ const loadUsers = async () => {
               <button
                 onClick={() => setCurrentPage((prev) => prev + 1)}
                 className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900"
+           
               >
                 Next ›
               </button>
