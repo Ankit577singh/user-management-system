@@ -8,17 +8,23 @@ function ListUsers() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
-  const loadUsers = async () => {
-    try {
-      const res = await getUsers(currentPage);
-      setUsers(res.data.users);
-      setFilteredUsers(res.data.users);
-    } catch (error) {
-      console.log("API Error:", error);
-    }
-  };
+const loadUsers = async () => {
+  try {
+    setLoading(true);              
+    const res = await getUsers(currentPage);
+    setUsers(res.data.users);
+    setFilteredUsers(res.data.users);
+  } catch (error) {
+    console.log("API Error:", error);
+  } finally {
+    setLoading(false);            
+  }
+};
+
 
   useEffect(() => {
     loadUsers();
@@ -163,8 +169,19 @@ function ListUsers() {
           )}
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="bg-white rounded-lg shadow-sm p-10 text-center">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-10 h-10 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-gray-600">Loading users...</p>
+            </div>
+          </div>
+        )}
+
+
         {/* No Results Message */}
-        {filteredUsers.length === 0 && (
+       {!loading && filteredUsers.length === 0 && (
           <div className="bg-white rounded-lg shadow-sm p-8 text-center">
             <div className="text-gray-400 mb-2">
               <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
